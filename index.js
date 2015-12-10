@@ -1,13 +1,14 @@
 "use strict"
 
 const Model_Generator = require("./lib/generator")
+const Template_Generator = require("./lib/template")
 
 class Multicolour_Frontend_Polymer {
   constructor() {
     this.targets = null
     this.config = null
     this.host = null
-    this.has_requested = false
+    this.has_requested_generation = false
   }
 
   register(multicolour) {
@@ -32,7 +33,7 @@ class Multicolour_Frontend_Polymer {
       // If we requested to generate but there where
       // no models set (because the server wasn't ready)
       // make sure to try again now that we're ready.
-      if (this.has_requested) {
+      if (this.has_requested_generation) {
         this.generate()
       }
     })
@@ -45,17 +46,22 @@ class Multicolour_Frontend_Polymer {
   generate() {
     // Get the tools.
     const Async = require("async")
+    const Utils = require("./lib/utils")
+    const start = Date.now()
 
     if (!this.targets) {
-      this.has_requested = true
+      this.has_requested_generation = true
       return this
     }
 
+    console.log("Generating.")
+    Utils.copy_static_assets(this.config)
+    
     // Generate the templates in parallel.
     Async.waterfall(
       [
-        // Get the model names.
-        callback => callback(null,
+        // Get the models.
+        next => next(null,
           Object.keys(this.targets)
             // Make an array of models.
             .map(key => this.targets[key])
@@ -65,20 +71,34 @@ class Multicolour_Frontend_Polymer {
         ),
 
         // Create the generators
-        (models, callback) => callback(null, models.map(model => new Model_Generator(model, this.host))),
+        (models, next) => next(null, models.map(model => new Model_Generator(model, this.host))),
 
         // Generate the templates.
-        (generators, callback) => generators.forEach(generator => Async.parallel([
-          template_callback => generator.template(template_callback),
-          template_callback => generator.list(template_callback),
-          template_callback => generator.single(template_callback),
-          template_callback => generator.create(template_callback),
-          template_callback => generator.read(template_callback),
-          template_callback => generator.update(template_callback)
-        ], callback))
+        (generators, next) => generators.forEach(generator => Async.parallel([
+          next => generator.list(next),
+          next => generator.single(next),
+          next => generator.create(next),
+          next => generator.read(next),
+          next => generator.update(next)
+        ], next)),
+
+        // Generate the app template.
+        (_, next) => {
+          // Get the model names.
+          const names = Object.keys(this.targets).filter(name => !this.targets[name].meta.junctionTable)
+
+          // Generate other templates.
+          new Template_Generator(names, this.host).generate(next)
+        }
       ],
-      (err, results) => {
-        console.log(err)
+      err => {
+        /* eslint-disable*/
+        if (err) {
+          console.error("ERROR during frontend generation", err)
+        }
+        console.log("---")
+        console.log("Took: %sms", Date.now() - start)
+        /* eslint-enable*/
       }
     )
   }
