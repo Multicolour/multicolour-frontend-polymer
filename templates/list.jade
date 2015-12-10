@@ -1,15 +1,24 @@
 link(rel="import" href="../../bower_components/polymer/polymer.html")
+link(rel="import" href="../shared-styles.html")
 
-dom-module(id="#{name}-data")
+dom-module(id="#{name}-list")  
   template
+    style(include="shared-styles")
+    link(rel="stylesheet" type="css" href="./styles.css")
+    
     iron-ajax(
-      id="req"
-      url="/#{name}"
-      method="get"
-      handle-as="json"
+      auto="false"
+      id="#{name}-req"
+      url="#{api_root}/#{name}"
+      headers="{\"authorization\": \"Bearer LAKq0wAAAAAAgn6MAAABUR9PVYM\", \"accept\": \"application/vnd.api+json\" }"
       last-response="{{response}}"
     )
+
+    template(is="dom-repeat" items="[[response.data]]")
+      #{name + "-single"}(id="[[item.id]]")
     
-    template(is="dom-repeat" items="response.items")
-      #{name}(id="[[item.id]]")
+  script.
+    Polymer({
+      is: "#{name}-list"
+    })
       

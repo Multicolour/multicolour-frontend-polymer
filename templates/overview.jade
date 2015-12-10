@@ -1,5 +1,12 @@
 link(rel="import" href="./bower_components/polymer/polymer.html")
 
-section.overview
-  each name in names 
-    #{name + "-list"}
+dom-module(id="data-overview")
+  template
+    .data-overview
+      each name in names
+        #{name + "-list"}
+        
+  script.
+    Polymer({
+      is: "data-overview"
+    })

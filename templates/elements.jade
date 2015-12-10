@@ -1,6 +1,11 @@
+link(rel="import" href="./bower_components/polymer/polymer.html")
+link(rel="import" href="./bower_components/iron-ajax/iron-ajax.html" async)
+
 each name in names
   link(rel="import" href="./#{name}/create.html" async)
   link(rel="import" href="./#{name}/list.html" async)
   link(rel="import" href="./#{name}/read.html" async)
   link(rel="import" href="./#{name}/single.html" async)
   link(rel="import" href="./#{name}/update.html" async)
+
+link(rel="import" href="./overview.html" async)

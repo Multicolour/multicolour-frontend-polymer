@@ -8,13 +8,14 @@ html(lang="en")
     meta(name="viewport" content="width=device-width")
     meta(name="generator" content="Multicolour - Multicolour-Polymer")
 
-    link(rel="import" href="./bower_components/iron-ajax/iron-ajax.html" async)
-    link(rel="import" href="./elements.html")
+    link(rel="stylesheet" href="./base.css" async)
+    link(rel="import" href="./elements.html" async)
   body 
     app-router
       app-route(path="/" element="overview")
       each name in names
         app-route(path="/#{name}" element="#{name}")
 
-    overview
+    data-overview
     script(src="./js/entry.js")
+    script document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')

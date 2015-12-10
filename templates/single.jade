@@ -1,0 +1,39 @@
+link(rel="import" href="../../bower_components/polymer/polymer.html")
+
+dom-module(id="#{name}-single")
+  template
+    iron-ajax(
+      auto="{{params_ready}}"
+      id="#{name}-req"
+      url="#{api_root}/#{name}/{{id}}"
+      headers="{\"authorization\": \"Bearer LAKq0wAAAAAAgn6MAAABUR9PVYM\", \"accept\": \"application/vnd.api+json\" }"
+      last-response="{{response}}"
+    )
+    p= JSON.stringify(attributes)
+    section(class="single #{name}-single")
+      each value, key in attributes
+        p
+          strong= key
+        p
+          em [[response.data.attributes.#{key}]]
+        
+  script.
+    Polymer({
+      is: "#{name}-single",
+      
+      properties: {
+        id: {
+          type: String,
+          value: null
+        },
+        params_ready: {
+          type: Boolean,
+          computed: "_params_ready(id)"
+        }
+      },
+      
+      _params_ready: function _params_ready(id) {
+        return id !== null
+      }
+    })
+      

@@ -1,0 +1,21 @@
+link(rel="import" href="../../bower_components/polymer/polymer.html")
+
+dom-module(id="#{name}-read")
+  template
+    iron-ajax(
+      auto
+      id="#{name}-req"
+      url="#{api_root}/#{name}"
+      method="get"
+      handle-as="json"
+      last-response="{{response}}"
+    )
+    
+    template(is="dom-repeat" items="response.items")
+      #{name + "-single"}(id="[[item.id]]")
+    
+    script.
+      Polymer({
+        is: "#{name}-read"
+      })
+      
