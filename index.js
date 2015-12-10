@@ -40,7 +40,28 @@ class Multicolour_Frontend_Polymer {
   }
 
   server() {
+    // Get the tools.
+    const fs = require("fs")
+    const path = require("path")
+    const config = this.config.get("frontend")
+    const target = config.theme_src_dir || path.resolve(__dirname, "./templates")
+    const livereload = require("livereload").createServer()
 
+    // Show the dev a friendly message.
+    /* eslint-disable */
+    console.log("Watching:", target)
+    /* eslint-enable */
+
+    // Watch for file changes and regenerate on change.
+    fs.watch(target, {
+      persistent: true,
+      recursive: true
+    }, () => this.generate())
+
+    // Tell live reload to watch.
+    livereload.watch(config.theme_build_dir || path.join(this.config.get("content"), "/frontend/build"))
+
+    return this
   }
 
   generate() {
@@ -54,24 +75,24 @@ class Multicolour_Frontend_Polymer {
       return this
     }
 
-    console.log("Generating.")
+    // Get the valid models for generation.
+    const models = Object.keys(this.targets)
+      // Make an array of models.
+      .map(key => this.targets[key])
+
+      // Filter out the junction tables and
+      // any models we specifically don't want
+      // to generate a frontend for.
+      .filter(model => !model.meta.junctionTable && !model.NO_AUTO_GEN_FRONTEND)
+
+    // Copy the static assets.
     Utils.copy_static_assets(this.config)
-    
+
     // Generate the templates in parallel.
     Async.waterfall(
       [
-        // Get the models.
-        next => next(null,
-          Object.keys(this.targets)
-            // Make an array of models.
-            .map(key => this.targets[key])
-
-            // Filter out the junction tables.
-            .filter(model => !model.meta.junctionTable)
-        ),
-
         // Create the generators
-        (models, next) => next(null, models.map(model => new Model_Generator(model, this.host))),
+        next => next(null, models.map(model => new Model_Generator(model, this.host))),
 
         // Generate the templates.
         (generators, next) => generators.forEach(generator => Async.parallel([
@@ -85,7 +106,7 @@ class Multicolour_Frontend_Polymer {
         // Generate the app template.
         (_, next) => {
           // Get the model names.
-          const names = Object.keys(this.targets).filter(name => !this.targets[name].meta.junctionTable)
+          const names = models.map(model => model.adapter.identity)
 
           // Generate other templates.
           new Template_Generator(names, this.host).generate(next)
