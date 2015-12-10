@@ -23,6 +23,10 @@
   "homepage": "https://github.com/newworldcode/multicolour-polymer#readme",
   "dependencies": {
     "async": "^1.5.0",
-    "jade": "^1.11.0"
-  }
+    "fs-extra": "^0.26.2",
+    "jade": "^1.11.0",
+    "map.prototype.tojson": "^0.1.3",
+    "mkdirp": "^0.5.1"
+  },
+  "devDependencies": {}
 }
