@@ -8,5 +8,13 @@ html(lang="en")
     meta(name="viewport" content="width=device-width")
     meta(name="generator" content="Multicolour - Multicolour-Polymer")
 
-  body
+    link(rel="import" href="./bower_components/iron-ajax/iron-ajax.html" async)
+    link(rel="import" href="./elements.html")
+  body 
+    app-router
+      app-route(path="/" element="overview")
+      each name in names
+        app-route(path="/#{name}" element="#{name}")
+
+    overview
     script(src="./js/entry.js")

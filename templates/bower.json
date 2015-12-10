@@ -1,0 +1,24 @@
+{
+  "name": "multicolour-frontend-polymer",
+  "homepage": "https://github.com/Multicolour/multicolour-example",
+  "authors": [
+    "davemackintosh <me@davemackintosh.co.uk>"
+  ],
+  "description": "Generated output from the Multicolour generator",
+  "main": "index.html",
+  "moduleType": [],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "~1.2.3",
+    "iron-ajax": "PolymerElements/iron-ajax#~1.1.1",
+    "app-router": "~2.6.1"
+  }
+}

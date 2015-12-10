@@ -1,0 +1,15 @@
+link(rel="import" href="../../bower_components/polymer/polymer.html")
+
+dom-module(id="#{name}-data")
+  template
+    iron-ajax(
+      id="req"
+      url="/#{name}"
+      method="get"
+      handle-as="json"
+      last-response="{{response}}"
+    )
+    
+    template(is="dom-repeat" items="response.items")
+      #{name}(id="[[item.id]]")
+      
