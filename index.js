@@ -1,6 +1,6 @@
 "use strict"
 
-const Model_Generator = require("./lib/generator")
+const Model_Generator = require("./lib/model-generator")
 const Template_Generator = require("./lib/template")
 
 class Multicolour_Frontend_Polymer {
