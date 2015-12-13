@@ -70,6 +70,12 @@ class Multicolour_Frontend_Polymer {
     const Utils = require("./lib/utils")
     const start = Date.now()
 
+    // Get where to get files from and where they're going.
+    const theme_src_dir = this.config.get("frontend").theme_src_dir
+    const theme_build_dir = this.config.get("frontend").theme_build_dir ||
+      `${this.config.get("content")}/frontend/build`
+
+    // Wait until we have models to generate with.
     if (!this.targets) {
       this.has_requested_generation = true
       return this
@@ -87,6 +93,33 @@ class Multicolour_Frontend_Polymer {
 
     // Copy the static assets.
     Utils.copy_static_assets(this.config)
+
+    // Does the theme have a frontend.json for other compile-ables?
+    const directives_path = `${theme_src_dir}/frontend.json`
+    Utils.file_exists(directives_path, (err, exists) => {
+      if (exists) {
+        const directives = require(directives_path)
+
+        // Compile everything we found.
+        Async.parallel(directives.map(directive => {
+          // Get the paths.
+          const src = `${theme_src_dir}/${directive}.jade`
+          const dest = `${theme_build_dir}/${directive}.html`
+
+          // Compile.
+          return next => Utils.compile_template(src, dest, { models }, next)
+        }), err => {
+          /* eslint-disable */
+          if (err) {
+            console.error("ERROR during frontend.json compilation", err)
+          }
+          else {
+            console.log("Compiled files listed in frontend.json")
+          }
+          /* eslint-enable */
+        })
+      }
+    })
 
     // Generate the templates in parallel.
     Async.waterfall(
