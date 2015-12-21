@@ -69,6 +69,7 @@ class Multicolour_Frontend_Polymer {
     const Async = require("async")
     const Utils = require("./lib/utils")
     const start = Date.now()
+    const config_as_json = Utils.map_to_object(this.config)
 
     // Get where to get files from and where they're going.
     const theme_src_dir = this.config.get("frontend").theme_src_dir
@@ -98,7 +99,15 @@ class Multicolour_Frontend_Polymer {
     const directives_path = `${theme_src_dir}/frontend.json`
     Utils.file_exists(directives_path, (err, exists) => {
       if (exists) {
+        // Uncache the directives.
+        delete require.cache[require.resolve(directives_path)]
+
+        // Reload the directives.
         const directives = require(directives_path)
+
+        // Create an object for the models.
+        const models_obj = {}
+        models.forEach(model => models_obj[model.adapter.identity] = model)
 
         // Compile everything we found.
         Async.parallel(directives.map(directive => {
@@ -107,14 +116,20 @@ class Multicolour_Frontend_Polymer {
           const dest = `${theme_build_dir}/${directive}.html`
 
           // Compile.
-          return next => Utils.compile_template(src, dest, { models }, next)
+          return next => Utils.compile_template(src, dest, {
+            models,
+            models_obj,
+            config: config_as_json,
+            api_root: config_as_json.frontend.api_root ||
+              `http://${config_as_json.api_connections.host}:${config_as_json.api_connections.port}`
+          }, next)
         }), err => {
           /* eslint-disable */
           if (err) {
             console.error("ERROR during frontend.json compilation", err)
           }
           else {
-            console.log("Compiled files listed in frontend.json")
+            console.log("Compiled %s files listed in frontend.json", directives.length)
           }
           /* eslint-enable */
         })
