@@ -21,6 +21,14 @@ class Multicolour_Frontend_Polymer {
     // Get the config from Multicolour.
     this.config = multicolour.get("config")
 
+    // Get the src and build directories.
+    const path = require("path")
+
+    // Get the config and default if no specific config was found.
+    const config = this.config.get("frontend")
+    this.src = config && config.theme_src_dir || path.join(this.config.get("content"), "/frontend/src")
+    this.build = config && config.theme_src_dir || path.join(this.config.get("content"), "/frontend/build")
+
     // Register the frontend.
     multicolour.reply("frontend", this)
 
@@ -39,28 +47,34 @@ class Multicolour_Frontend_Polymer {
     })
   }
 
-  server() {
+  /**
+   * Watch files in the build directory for changes
+   * and regenerate if/when anything changes and live
+   * reload any open browsers with livereload enabled.
+   * @return {Multicolour_Frontend_Polymer} object for chaining calls.
+   */
+  watch() {
     // Get the tools.
     const fs = require("fs")
-    const path = require("path")
-    const config = this.config.get("frontend")
-    const target = config.theme_src_dir || path.resolve(__dirname, "./templates")
+
+    // Create a live reload server.
     const livereload = require("livereload").createServer()
 
     // Show the dev a friendly message.
     /* eslint-disable */
-    console.log("Watching:", target)
+    console.log("Watching:", this.src)
     /* eslint-enable */
 
     // Watch for file changes and regenerate on change.
-    fs.watch(target, {
+    fs.watch(this.src, {
       persistent: true,
       recursive: true
     }, () => this.generate())
 
     // Tell live reload to watch.
-    livereload.watch(config.theme_build_dir || path.join(this.config.get("content"), "/frontend/build"))
+    livereload.watch(this.build)
 
+    // Exit.
     return this
   }
 
@@ -70,11 +84,6 @@ class Multicolour_Frontend_Polymer {
     const Utils = require("./lib/utils")
     const start = Date.now()
     const config_as_json = Utils.map_to_object(this.config)
-
-    // Get where to get files from and where they're going.
-    const theme_src_dir = this.config.get("frontend").theme_src_dir
-    const theme_build_dir = this.config.get("frontend").theme_build_dir ||
-      `${this.config.get("content")}/frontend/build`
 
     // Wait until we have models to generate with.
     if (!this.targets) {
@@ -93,10 +102,10 @@ class Multicolour_Frontend_Polymer {
       .filter(model => !model.meta.junctionTable && !model.NO_AUTO_GEN_FRONTEND)
 
     // Copy the static assets.
-    Utils.copy_static_assets(this.config)
+    Utils.copy_static_assets(this.src, this.build)
 
     // Does the theme have a frontend.json for other compile-ables?
-    const directives_path = `${theme_src_dir}/frontend.json`
+    const directives_path = `${this.src}/frontend.json`
     Utils.file_exists(directives_path, (err, exists) => {
       if (exists) {
         // Uncache the directives.
@@ -112,15 +121,15 @@ class Multicolour_Frontend_Polymer {
         // Compile everything we found.
         Async.parallel(directives.map(directive => {
           // Get the paths.
-          const src = `${theme_src_dir}/${directive}.jade`
-          const dest = `${theme_build_dir}/${directive}.html`
+          const src = `${this.src}/${directive}.jade`
+          const dest = `${this.build}/${directive}.html`
 
           // Compile.
           return next => Utils.compile_template(src, dest, {
             models,
             models_obj,
             config: config_as_json,
-            api_root: config_as_json.frontend.api_root ||
+            api_root: config_as_json.frontend && config_as_json.frontend.api_root ||
               `http://${config_as_json.api_connections.host}:${config_as_json.api_connections.port}`
           }, next)
         }), err => {
@@ -140,7 +149,7 @@ class Multicolour_Frontend_Polymer {
     Async.waterfall(
       [
         // Create the generators
-        next => next(null, models.map(model => new Model_Generator(model, this.host))),
+        next => next(null, models.map(model => new Model_Generator(model, this))),
 
         // Generate the templates.
         (generators, next) => generators.forEach(generator => Async.parallel([
@@ -157,7 +166,7 @@ class Multicolour_Frontend_Polymer {
           const names = models.map(model => model.adapter.identity)
 
           // Generate other templates.
-          new Template_Generator(names, this.host).generate(next)
+          new Template_Generator(names, this).generate(next)
         }
       ],
       err => {
