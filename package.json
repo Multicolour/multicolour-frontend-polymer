@@ -1,6 +1,6 @@
 {
   "name": "multicolour-polymer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Template & Generator for Multicolour framework based on Polymer",
   "main": "index.js",
   "scripts": {
