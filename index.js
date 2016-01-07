@@ -26,8 +26,14 @@ class Multicolour_Frontend_Polymer {
 
     // Get the config and default if no specific config was found.
     const config = this.config.get("frontend")
-    this.src = config && config.theme_src_dir || path.join(this.config.get("content"), "/frontend/src")
-    this.build = config && config.theme_src_dir || path.join(this.config.get("content"), "/frontend/build")
+    if (!config) {
+      this.src = path.join(this.config.get("content"), "frontend", "src")
+      this.build = path.join(this.config.get("content"), "frontend", "build")
+    }
+    else {
+      this.src = config.theme_src_dir || path.join(this.config.get("content"), "frontend", "src")
+      this.build = config.theme_src_dir || path.join(this.config.get("content"), "frontend", "build")
+    }
 
     // Register the frontend.
     multicolour.reply("frontend", this)
@@ -63,6 +69,7 @@ class Multicolour_Frontend_Polymer {
     // Show the dev a friendly message.
     /* eslint-disable */
     console.log("Watching:", this.src)
+    console.log("Build target:", this.build)
     /* eslint-enable */
 
     // Watch for file changes and regenerate on change.
