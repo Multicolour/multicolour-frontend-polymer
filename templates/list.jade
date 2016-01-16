@@ -1,11 +1,7 @@
-link(rel="import" href="../../bower_components/polymer/polymer.html")
-link(rel="import" href="../shared-styles.html")
+link(rel="import" href="/bower_components/polymer/polymer.html")
 
 dom-module(id="#{name}-list")  
-  template
-    style(include="shared-styles")
-    link(rel="stylesheet" type="css" href="./styles.css")
-    
+  template    
     iron-ajax(
       auto="false"
       id="#{name}-req"

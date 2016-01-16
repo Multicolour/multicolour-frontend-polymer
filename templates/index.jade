@@ -2,20 +2,54 @@ doctype html
 html(lang="en")
   head
     meta(charset="utf-8")
-    title= name || "Multicolour Polymer"
+    title= config.frontend ? config.frontend.name : "Multicolour Polymer"
 
-    meta(name="description" content="")
-    meta(name="viewport" content="width=device-width")
-    meta(name="generator" content="Multicolour - Multicolour-Polymer")
+    //- Set some basic META information.
+    meta(name="description" content=package.description)
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="apple-mobile-web-app-capable" content="yes")
+    meta(name="apple-mobile-web-app-status-bar-style" content="black")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    
+    //- Feel free to remove this but it would be rad if you kept it <3
+    meta(name="generator" content="Multicolour - Polymer")
 
-    link(rel="stylesheet" href="./base.css" async)
-    link(rel="import" href="./elements.html" async)
-  body 
-    app-router
-      app-route(path="/" element="overview")
-      each name in names
-        app-route(path="/#{name}" element="#{name}")
+    //- Prefetch the API to make access faster.
+    link(rel="dns-prefetch" href="#{api_root}")
+    
+    //- Get our base stylesheet, prevent FOUC
+    link(rel="stylesheet" href="/css/base.css")
+    
+    //- Import all of our elements.
+    link(rel="import" href="/elements.html" async)
 
-    data-overview
+  body
+    template(is="dom-bind" id="app")          
+      paper-drawer-panel#drawer-panel
+        paper-scroll-header-panel(drawer fixed)
+          paper-toolbar#toolbar
+            span(class="menu-name") Menu
+          paper-menu(attr-for-selected="data-route" selected="[[route]]")
+            a(data-route="home" href="/")
+              iron-icon(icon="home")
+              span Home
+            each name in names
+              a(data-route="#{name}" href="/#{name}")
+                span #{name}
+                
+        paper-scroll-header-panel(main condenses keep-condensed-header)
+          paper-toolbar#main-toolbar.tall
+            paper-icon-button#toggle(icon="menu" paper-drawer-toggle)
+            .middle.middle-container
+              .app-name= config.frontend ? config.frontend.name : "Multicolour Polymer"
+          
+          app-router
+            app-route(path="/" element="home-element")
+            each name in names
+              app-route(path="/#{name}" element="#{name}-list")
+              app-route(path="/#{name}/new" element="#{name}-create")
+              app-route(path="/#{name}/:rid" element="#{name}-single")
+              app-route(path="/#{name}/:rid/edit" element="#{name}-update")
+
     script(src="./js/entry.js")
     script document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')

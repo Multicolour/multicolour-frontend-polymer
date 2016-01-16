@@ -1,11 +1,25 @@
-link(rel="import" href="./bower_components/polymer/polymer.html")
-link(rel="import" href="./bower_components/iron-ajax/iron-ajax.html" async)
+//- Frameworks and helpers.
+link(rel="import" href="/bower_components/polymer/polymer.html")
+link(rel="import" href="/bower_components/iron-ajax/iron-ajax.html")
+link(rel="import" href="/bower_components/pushstate-anchor/pushstate-anchor.html")
+link(rel="import" href="/bower_components/app-router/app-router.html")
+link(rel="import" href="/bower_components/iron-icons/iron-icons.html" async)
+link(rel="import" href="/bower_components/paper-header-panel/paper-header-panel.html" async)
+link(rel="import" href="/bower_components/paper-drawer-panel/paper-drawer-panel.html" async)
+link(rel="import" href="/bower_components/paper-menu/paper-menu.html" async)
+link(rel="import" href="/bower_components/paper-card/paper-card.html" async)
+link(rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" async)
 
+link(rel="import" href="/home.html")
+
+//- Our frontend.json elements.
+each directive in directives
+  link(rel="import" href="/#{directive}.html" async)
+
+//- Each model we find.
 each name in names
-  link(rel="import" href="./#{name}/create.html" async)
-  link(rel="import" href="./#{name}/list.html" async)
-  link(rel="import" href="./#{name}/read.html" async)
-  link(rel="import" href="./#{name}/single.html" async)
-  link(rel="import" href="./#{name}/update.html" async)
-
-link(rel="import" href="./overview.html" async)
+  link(rel="import" href="/#{name}/create.html" async)
+  link(rel="import" href="/#{name}/read.html" async)
+  link(rel="import" href="/#{name}/single.html" async)
+  link(rel="import" href="/#{name}/update.html" async)
+  link(rel="import" href="/#{name}/list.html" async)

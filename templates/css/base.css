@@ -1,0 +1,9 @@
+html, body {
+  margin: 0;
+  font-family: "Roboto", Helvetica, Arial, sans-serif;
+}
+
+paper-toolbar {
+  height: 192px;
+  background-color: #3f51b5;
+}
