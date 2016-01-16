@@ -136,6 +136,7 @@ class Multicolour_Frontend_Polymer {
             models,
             models_obj,
             config: config_as_json,
+            package: require("../../package.json"),
             api_root: config_as_json.frontend && config_as_json.frontend.api_root ||
               `http://${config_as_json.api_connections.host}:${config_as_json.api_connections.port}`
           }, next)
