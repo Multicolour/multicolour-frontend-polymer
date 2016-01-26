@@ -2,20 +2,68 @@ link(rel="import" href="/bower_components/polymer/polymer.html")
 
 dom-module(id="#{name}-create")
   template
-    iron-ajax(
-      auto
-      id="#{name}-req"
+    iron-ajax#req(
+      method="post"
       url="#{api_root}/#{name}"
-      method="get"
-      handle-as="json"
-      last-response="{{response}}"
+      headers="{{xhr_headers}}"
+      content-type="application/json"
+      last-response="{{new_#{name}}}"
     )
     
-    template(is="dom-repeat" items="response.items")
-      #{name + "-single"}(id="[[item.id]]")
-    
-    script.
-      Polymer({
-        is: "#{name}-create"
-      })
+    section
+      h1 Create a new #{name}
+      form(is="iron-form")
+        - each value, key in writable_attributes
+          paper-input(label="#{key}" name="#{key}" type="#{value.type}" id="#{key}")
+        paper-button(raised on-click="_submit_new_#{name}") Create #{name}
       
+  //- This is necessary because Jade doesn't
+  script.
+    Polymer({
+      is: "#{name}-create",
+      
+      properties: {
+        keys: {
+          type: String,
+          readOnly: true,
+
+          //- Jade compiles this into an array like ["name", "age"]
+          value: [!{Object.keys(writable_attributes).map(key => `"${key}"`)}]
+        },
+        xhr_headers: {
+          type: Object,
+          notify: true,
+          computed: "_xhr_headers(keys)"
+        }
+      },
+
+      _xhr_headers: function get_xhr_headers(stuff) {
+        return window.app.get("headers")
+      },
+
+      /**
+       * Loop over the properties we have inputs for
+       * and create the payload for Multicolour.
+       * 
+       * Most of the time, you'll want to customise
+       * this and that negates the need for the keys
+       * property and this loop.
+       * 
+       * @return {void}
+       */
+      _submit_new_#{name}: function _submit_new_#{name}() {
+        //- Get the target.
+        var target = this.$.req
+        
+        //- Body is null by default, make it an object.
+        target.body = {}
+        
+        //- Get the keys from Multicolour.
+        this.get("keys").forEach(function(key) {
+          target.body[key] = this.$[key].value
+        }.bind(this))
+        
+        target.generateRequest()
+      }
+    })
+    

@@ -1,22 +1,29 @@
-//- Frameworks and helpers.
+//- Functional frameworks and helpers.
 link(rel="import" href="/bower_components/polymer/polymer.html")
 link(rel="import" href="/bower_components/iron-ajax/iron-ajax.html")
 link(rel="import" href="/bower_components/pushstate-anchor/pushstate-anchor.html")
 link(rel="import" href="/bower_components/app-router/app-router.html")
-link(rel="import" href="/bower_components/iron-icons/iron-icons.html" async)
-link(rel="import" href="/bower_components/paper-header-panel/paper-header-panel.html" async)
-link(rel="import" href="/bower_components/paper-drawer-panel/paper-drawer-panel.html" async)
-link(rel="import" href="/bower_components/paper-menu/paper-menu.html" async)
-link(rel="import" href="/bower_components/paper-card/paper-card.html" async)
-link(rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" async)
 
-link(rel="import" href="/home.html")
+//- Layout frameworks and helpers.
+link(rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout.html")
+link(rel="import" href="/bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html")
+link(rel="import" href="/bower_components/paper-drawer-panel/paper-drawer-panel.html")
+link(rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html")
+link(rel="import" href="/bower_components/paper-item/paper-item.html")
+link(rel="import" href="/bower_components/paper-material/paper-material.html")
+link(rel="import" href="/bower_components/paper-menu/paper-menu.html")
+link(rel="import" href="/bower_components/paper-styles/typography.html")
+link(rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html")
+link(rel="import" href="/bower_components/paper-input/paper-input.html")
+link(rel="import" href="/bower_components/paper-button/paper-button.html")
+
+link(rel="import" href="/bower_components/iron-icons/iron-icons.html" async)
 
 //- Our frontend.json elements.
 each directive in directives
   link(rel="import" href="/#{directive}.html" async)
 
-//- Each model we find.
+//- Each blueprint we have.
 each name in names
   link(rel="import" href="/#{name}/create.html" async)
   link(rel="import" href="/#{name}/read.html" async)

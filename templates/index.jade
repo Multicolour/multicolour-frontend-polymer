@@ -17,31 +17,35 @@ html(lang="en")
     //- Prefetch the API to make access faster.
     link(rel="dns-prefetch" href="#{api_root}")
     
-    //- Get our base stylesheet, prevent FOUC
+    //- Get our base stylesheet, prevent FOUC.
     link(rel="stylesheet" href="/css/base.css")
     
     //- Import all of our elements.
-    link(rel="import" href="/elements.html" async)
+    link(rel="import" href="/elements.html")
 
   body
-    template(is="dom-bind" id="app")          
+    template#app(is="dom-bind")
       paper-drawer-panel#drawer-panel
         paper-scroll-header-panel(drawer fixed)
           paper-toolbar#toolbar
-            span(class="menu-name") Menu
+            span.menu-name Menu
+
           paper-menu(attr-for-selected="data-route" selected="[[route]]")
-            a(data-route="home" href="/")
+            a(data-route="home" href="/" is="pushstate-anchor")
               iron-icon(icon="home")
               span Home
             each name in names
-              a(data-route="#{name}" href="/#{name}")
+              a(data-route="#{name}" href="/#{name}" class="#{name}-menu-item" is="pushstate-anchor")
                 span #{name}
                 
         paper-scroll-header-panel(main condenses keep-condensed-header)
           paper-toolbar#main-toolbar.tall
             paper-icon-button#toggle(icon="menu" paper-drawer-toggle)
+            
+            paper-icon-button(icon="lock")
+            
             .middle.middle-container
-              .app-name= config.frontend ? config.frontend.name : "Multicolour Polymer"
+              h1.app-name= config.frontend ? config.frontend.name : "Multicolour Polymer"
           
           app-router
             app-route(path="/" element="home-element")
@@ -51,5 +55,5 @@ html(lang="en")
               app-route(path="/#{name}/:rid" element="#{name}-single")
               app-route(path="/#{name}/:rid/edit" element="#{name}-update")
 
-    script(src="./js/entry.js")
+    script(src="/js/entry.js")
     script document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')

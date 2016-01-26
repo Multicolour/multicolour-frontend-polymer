@@ -6,16 +6,17 @@ dom-module(id="#{name}-single")
       auto="{{params_ready}}"
       id="#{name}-req"
       url="#{api_root}/#{name}/{{id}}"
-      headers="{\"authorization\": \"Bearer LAKq0wAAAAAAgn6MAAABUR9PVYM\", \"accept\": \"application/vnd.api+json\" }"
+      headers="{{xhr_headers}}"
       last-response="{{response}}"
     )
-    p= JSON.stringify(attributes)
+
     section(class="single #{name}-single")
-      each value, key in attributes
-        p
-          strong= key
-        p
-          em [[response.data.attributes.#{key}]]
+      ul
+        each value, key in attributes
+          li.row
+            strong= key
+            | &nbsp;
+            em [[response.data.attributes.#{key}]]
         
   script.
     Polymer({
@@ -29,11 +30,20 @@ dom-module(id="#{name}-single")
         params_ready: {
           type: Boolean,
           computed: "_params_ready(id)"
+        },
+        xhr_headers: {
+          type: Object,
+          notify: true,
+          computed: "_xhr_headers(id)"
         }
       },
       
       _params_ready: function _params_ready(id) {
         return id !== null
+      },
+      
+      _xhr_headers: function get_xhr_headers() {
+        return window.app.get("headers")
       }
     })
       

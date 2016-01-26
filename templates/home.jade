@@ -2,9 +2,7 @@ link(rel="import" href="/bower_components/polymer/polymer.html")
 
 dom-module(is="home-element")
   template
-    h1 HAI
+    h1 HAI,
+      span [[name]]
     
-  script.
-    Polymer({
-      is: "home-element"
-    })
+  script Polymer({ is: "home-element" })

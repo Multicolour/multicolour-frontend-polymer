@@ -4,6 +4,19 @@ html, body {
 }
 
 paper-toolbar {
+  display: block;
   height: 192px;
   background-color: #3f51b5;
+}
+
+paper-menu a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  padding: 1em;
+  text-transform: capitalize;
+}
+
+paper-menu a:hover {
+  text-decoration: underline;
 }

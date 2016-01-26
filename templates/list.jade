@@ -6,15 +6,46 @@ dom-module(id="#{name}-list")
       auto="false"
       id="#{name}-req"
       url="#{api_root}/#{name}"
-      headers="{\"authorization\": \"Bearer LAKq0wAAAAAAgn6MAAABUR9PVYM\", \"accept\": \"application/vnd.api+json\" }"
-      last-response="{{response}}"
+      headers="[[xhr_headers]]"
+      on-response="_#{name}_response"
     )
 
-    template(is="dom-repeat" items="[[response.data]]")
+    a(is="pushstate-anchor" href="/#{name}/new") Create a new #{name}
+
+    template(is="dom-repeat" items="[[response]]")
       #{name + "-single"}(id="[[item.id]]")
     
   script.
     Polymer({
-      is: "#{name}-list"
+      is: "#{name}-list",
+      
+      properties: {
+        response: {
+          type: Array,
+          value: function() {
+            return []
+          }
+        },
+        xhr_headers: {
+          type: Object,
+          notify: true,
+          computed: "_xhr_headers(response)"
+        }
+      },
+      
+      _xhr_headers: function get_xhr_headers(stuff) {
+        return window.app.get("headers")
+      },
+      
+      _#{name}_response: function _#{name}_response(event, request) {
+        var response = request.xhr.response
+        
+        if (Array.isArray(response.data)) {
+          this.set("response", response.data)
+        }
+        else {
+          this.set("response", [response.data])
+        }
+      }
     })
       
