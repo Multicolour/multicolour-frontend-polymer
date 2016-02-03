@@ -2,48 +2,114 @@ link(rel="import" href="/bower_components/polymer/polymer.html")
 
 dom-module(id="#{name}-single")
   template
-    iron-ajax(
-      auto="{{params_ready}}"
-      id="#{name}-req"
-      url="#{api_root}/#{name}/{{id}}"
-      headers="{{xhr_headers}}"
-      last-response="{{response}}"
+    style.
+      :host {
+        display: block;
+        padding: 1em;
+      }
+      
+      .row {
+        padding: 1em 0;
+      }
+      
+      .row:nth-child(odd) {
+        background: rgba(63, 81, 181, .02);
+      }
+      
+      .row.key {
+        text-transform: capitalize;
+      }
+      
+      a {
+        display: inline-block;
+        text-align: right;
+        text-decoration: none;
+        color: #333;
+        padding: 1em;
+        background: #FFF;
+        margin: 1em 0;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+      }
+      
+    iron-ajax#req(
+      url="#{api_root}/#{name}/[[rid]]"
+      auto="[[params_ready]]"
+      headers="[[xhr_headers]]"
+      last-response="{{entity}}"
     )
 
-    section(class="single #{name}-single")
-      ul
+    section(class="#{name}-single")
+      paper-material(elevation="1")
+        content
         each value, key in attributes
-          li.row
+          .row.key
             strong= key
-            | &nbsp;
-            em [[response.data.attributes.#{key}]]
-        
+          .row.value
+            - if (value.model || value.collection)
+              template(is="dom-repeat" items="{{_get_included(entity, '#{value.model || value.collection}')}}")
+                a(is="pushstate-anchor" href$="/{{item.type}}/[[item.id]]") View {{item.type}} {{item.id}}
+                #{(value.model || value.collection) + "-single"}(rid="[[item.id]]" no-relationships="true")
+            - else if (key !== "id")
+              em [[entity.data.attributes.#{key}]]
+            - else
+              em [[entity.data.id]]
+    
   script.
     Polymer({
       is: "#{name}-single",
       
       properties: {
-        id: {
-          type: String,
-          value: null
-        },
         params_ready: {
           type: Boolean,
-          computed: "_params_ready(id)"
+          computed: "_params_ready(rid)"
         },
+        
+        rid: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true
+        },
+        
+        entity: {
+          type: Object,
+          notify: true
+        },
+        
         xhr_headers: {
           type: Object,
           notify: true,
-          computed: "_xhr_headers(id)"
+          computed: "_xhr_headers(rid)"
+        },
+        
+        noRelationships: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
       },
       
-      _params_ready: function _params_ready(id) {
-        return id !== null
+      _params_ready: function _params_ready(rid) {
+        return !!rid
       },
       
       _xhr_headers: function get_xhr_headers() {
         return window.app.get("headers")
+      },
+      
+      _get_included: function _get_included(entity, type) {
+        if (this.get("noRelationships")) {
+          return
+        }
+        const included = entity.included
+
+        if (!included || included.length === 0) {
+          return []
+        }
+        else {
+          return included.filter(function included_filter(include) {
+            return include.type === type
+          })
+        }
       }
     })
       

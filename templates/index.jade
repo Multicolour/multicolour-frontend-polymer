@@ -19,6 +19,8 @@ html(lang="en")
     
     //- Get our base stylesheet, prevent FOUC.
     link(rel="stylesheet" href="/css/base.css")
+    link(rel="mask-icon" href="/assets/website_icon.svg" color="red")
+    link(rel="icon" href="/assets/favicon.ico" type="image/x-icon")
     
     //- Import all of our elements.
     link(rel="import" href="/elements.html")
@@ -28,28 +30,33 @@ html(lang="en")
       paper-drawer-panel#drawer-panel
         paper-scroll-header-panel(drawer fixed)
           paper-toolbar#toolbar
-            span.menu-name Menu
+            paper-icon-button#toggle(icon="menu" paper-drawer-toggle) Menu
 
+          //- MENU.
           paper-menu(attr-for-selected="data-route" selected="[[route]]")
             a(data-route="home" href="/" is="pushstate-anchor")
               iron-icon(icon="home")
               span Home
-            each name in names
+            - each name in names
               a(data-route="#{name}" href="/#{name}" class="#{name}-menu-item" is="pushstate-anchor")
+                iron-icon(icon="chevron-right")
                 span #{name}
-                
+            a(href="#{api_root}/session/twitter")
+              iron-icon(icon="lock")
+              span Login
+
+        //- TOP BAR WITH APP NAME AND DESCRIPTION IN IT.
         paper-scroll-header-panel(main condenses keep-condensed-header)
           paper-toolbar#main-toolbar.tall
-            paper-icon-button#toggle(icon="menu" paper-drawer-toggle)
-            
-            paper-icon-button(icon="lock")
-            
             .middle.middle-container
               h1.app-name= config.frontend ? config.frontend.name : "Multicolour Polymer"
+            .bottom
+              p.app-description= config.frontend ? config.frontend.description : "REST API & Polymer app generator."
           
+          //- ROUTER.
           app-router
             app-route(path="/" element="home-element")
-            each name in names
+            - each name in names
               app-route(path="/#{name}" element="#{name}-list")
               app-route(path="/#{name}/new" element="#{name}-create")
               app-route(path="/#{name}/:rid" element="#{name}-single")

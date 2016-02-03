@@ -2,6 +2,12 @@ link(rel="import" href="/bower_components/polymer/polymer.html")
 
 dom-module(id="#{name}-create")
   template
+    style.
+      :host {
+        display: block;
+        padding: 1em;
+      }
+
     iron-ajax#req(
       method="post"
       url="#{api_root}/#{name}"
@@ -10,11 +16,18 @@ dom-module(id="#{name}-create")
       last-response="{{new_#{name}}}"
     )
     
-    section
+    paper-material(elevation="1")
       h1 Create a new #{name}
       form(is="iron-form")
         - each value, key in writable_attributes
-          paper-input(label="#{key}" name="#{key}" type="#{value.type}" id="#{key}")
+          - if (value.model || value.collection)
+            paper-input(label="#{key}" name="#{key}" id="#{key}" list="#{key}-datalist" autocomplete)
+            datalist(id="#{key}-datalist")
+              option(value="test") rhgwr
+              option(value="cookies")
+          - else
+            paper-input(label="#{key}" name="#{key}" type="#{value.type}" id="#{key}")
+
         paper-button(raised on-click="_submit_new_#{name}") Create #{name}
       
   //- This is necessary because Jade doesn't

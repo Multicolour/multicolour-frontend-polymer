@@ -7,6 +7,11 @@ paper-toolbar {
   display: block;
   height: 192px;
   background-color: #3f51b5;
+  color: #fff;
+}
+
+paper-menu {
+  height: 100%;
 }
 
 paper-menu a {
@@ -15,8 +20,25 @@ paper-menu a {
   color: inherit;
   padding: 1em;
   text-transform: capitalize;
+  vertical-align: top;
+}
+
+paper-menu a span {
+  margin-left: .5em;
+  line-height: 100%;
 }
 
 paper-menu a:hover {
   text-decoration: underline;
+}
+
+paper-material {
+  display: block;
+  background: #FFF;
+  padding: 1em;
+  margin-bottom: 1em;
+}
+
+#mainContainer {
+  background-color: #F9F9F9;
 }

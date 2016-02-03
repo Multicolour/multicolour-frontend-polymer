@@ -2,7 +2,32 @@ link(rel="import" href="/bower_components/polymer/polymer.html")
 
 dom-module(is="home-element")
   template
-    h1 HAI,
-      span [[name]]
+    style.
+      :host {
+        display: block;
+        padding: 2em;
+      }
+
+    paper-material(elevation="1")
+      h1 Welcome to the Multicolour Polymer generator!
+      p You have a new folder in your <code>content</code> folder, <code>frontend</code> which contains your source and built resources.
+      p The generator uses 
+        a(href="http://jade-lang.com" target="_blank") Jade
+        |  to create simple templates that render into the html you're seeing.
+      p We've copied and generated the basics for you including:
+
+      ul
+        - each value, key in models_obj
+          li #{key}/create.html
+          li #{key}/list.html
+          li #{key}/single.html
+          li #{key}/update.html
+
+      p You also have a router generated for you for your basic CRUD actions.
+      p
+        | You'll notice that the 
+        a(href="/user" is="pushstate-anchor") users
+        |  page has a different template, this is done by creating a <code>user</code> folder in <code>content/frontend/src</code> and creating a new <code>list.jade</code> template.
+      
     
   script Polymer({ is: "home-element" })
