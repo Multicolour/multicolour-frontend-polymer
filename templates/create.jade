@@ -58,14 +58,17 @@ dom-module(id="#{name}-create")
               relation="related_#{value.model || value.collection}"
             )
           - else if (value.enum)
-            paper-select(
-              id="#{key}"
-              name="#{key}" 
-              label="Select #{key}"
-              options='[#{value.enum.map(value => `"${value}"`)}]'
-            )
+            paper-dropdown-menu(label="#{key}" id="#{key}" placeholder="Select #{key}" noink)
+              paper-menu.dropdown-content
+                - each option_value, _ in value.enum
+                  paper-item(value=option_value)= option_value
           - else
-            paper-input(label="#{key}" name="#{key}" type="#{value.type}" id="#{key}")
+            paper-input(
+              id="#{key}"
+              name="#{key}"
+              label="#{key}"
+              type="#{type_to_html_input_type(value.type)}"
+            )
 
         paper-button(raised on-click="_submit_new") Create new #{name}
       
@@ -157,6 +160,7 @@ dom-module(id="#{name}-create")
         
         //- Get the keys from Multicolour.
         this.get("keys").forEach(function(key) {
+          console.log(this.$[key])
           target.body[key] = this.$[key].value
         }.bind(this))
         

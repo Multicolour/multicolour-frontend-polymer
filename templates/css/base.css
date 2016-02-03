@@ -14,7 +14,7 @@ paper-toolbar {
   height: 100%;
 }
 
-paper-menu a {
+#main-menu a {
   display: block;
   text-decoration: none;
   color: inherit;
@@ -23,12 +23,12 @@ paper-menu a {
   vertical-align: top;
 }
 
-paper-menu a span {
+#main-menu a span {
   margin-left: .5em;
   line-height: 100%;
 }
 
-paper-menu a:hover {
+#main-menu a:hover {
   text-decoration: underline;
 }
 
