@@ -164,7 +164,6 @@ class Multicolour_Frontend_Polymer {
           next => generator.list(next),
           next => generator.single(next),
           next => generator.create(next),
-          next => generator.read(next),
           next => generator.update(next)
         ], next)),
 
