@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="307px" height="329px" viewBox="0 0 307 329" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.4.4 (17249) - http://www.bohemiancoding.com/sketch -->
+    <title>logo-square</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="89.6101562%" y1="18.178125%" x2="14.4695313%" y2="86.2132812%" id="linearGradient-1">
+            <stop stop-color="#C43A8C" offset="0%"></stop>
+            <stop stop-color="#16A8AE" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#C43A8C" offset="0%"></stop>
+            <stop stop-color="#16A8AE" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Square" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Circle" sketch:type="MSLayerGroup" transform="translate(29.000000, 40.000000)" stroke-width="12">
+            <path d="M125,250 C194.035594,250 250,194.035594 250,125 C250,55.9644063 194.035594,0 125,0 C55.9644063,0 0,55.9644063 0,125 C0,194.035594 55.9644063,250 125,250 Z" id="Oval-1" stroke="url(#linearGradient-1)" sketch:type="MSShapeGroup"></path>
+            <path d="M124.625,122.034169 C124.625,94.4201964 102.239452,72.0346489 74.6254801,72.0346489 C47.0115078,72.0346489 24.6259603,94.4201964 24.6259603,122.034169 C24.6259603,149.648141 124.625,149.648141 124.625,122.034169 Z M125.375,127.965831 C125.375,155.579804 147.760548,177.965351 175.37452,177.965351 C202.988492,177.965351 225.37404,155.579804 225.37404,127.965831 C225.37404,100.351859 125.375,100.351859 125.375,127.965831 Z" id="Oval-2" stroke="url(#linearGradient-2)" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>
