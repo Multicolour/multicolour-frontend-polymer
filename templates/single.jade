@@ -61,7 +61,8 @@ dom-module(id="#{name}-single")
       properties: {
         params_ready: {
           type: Boolean,
-          computed: "_params_ready(rid)"
+          notify: true,
+          computed: "_params_ready(rid, xhr_headers)"
         },
         
         rid: {
@@ -88,8 +89,8 @@ dom-module(id="#{name}-single")
         }
       },
       
-      _params_ready: function _params_ready(rid) {
-        return !!rid
+      _params_ready: function _params_ready(rid, xhr_headers) {
+        return !!rid && !!xhr_headers
       },
       
       _xhr_headers: function get_xhr_headers() {

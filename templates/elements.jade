@@ -15,8 +15,12 @@ link(rel="import" href="/bower_components/paper-menu/paper-menu.html")
 link(rel="import" href="/bower_components/paper-styles/typography.html")
 link(rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html")
 link(rel="import" href="/bower_components/paper-input/paper-input.html")
+link(rel="import" href="/bower_components/paper-select/paper-select.html")
 link(rel="import" href="/bower_components/paper-button/paper-button.html")
 
+//- Everything below is loaded asynchronously
+//- so we don't prevent anything else loading
+//- or rendering.
 link(rel="import" href="/bower_components/iron-icons/iron-icons.html" async)
 
 //- Our frontend.json elements.
@@ -26,7 +30,6 @@ each directive in directives
 //- Each blueprint we have.
 each name in names
   link(rel="import" href="/#{name}/create.html" async)
-  link(rel="import" href="/#{name}/read.html" async)
   link(rel="import" href="/#{name}/single.html" async)
   link(rel="import" href="/#{name}/update.html" async)
   link(rel="import" href="/#{name}/list.html" async)

@@ -6,11 +6,11 @@ html, body {
 paper-toolbar {
   display: block;
   height: 192px;
-  background-color: #3f51b5;
+  background-color: #C43A8C;
   color: #fff;
 }
 
-paper-menu {
+#main-menu {
   height: 100%;
 }
 

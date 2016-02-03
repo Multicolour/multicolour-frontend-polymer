@@ -7,7 +7,12 @@ dom-module(id="#{name}-create")
         display: block;
         padding: 1em;
       }
+      
+      paper-button {
+        margin-top: 1em;
+      }
 
+    //- Request for this particular resource.
     iron-ajax#req(
       method="post"
       url="#{api_root}/#{name}"
@@ -16,21 +21,54 @@ dom-module(id="#{name}-create")
       last-response="{{new_#{name}}}"
     )
     
+    //- For each writable key, check if it
+    //- has any associations and create ajax
+    //- requests for each one.
+    - each value, key in writable_attributes
+      - if (value.model || value.collection)
+        iron-ajax(
+          auto="{{xhr_headers}}"
+          url="#{api_root}/#{value.model || value.collection}"
+          headers="{{xhr_headers}}"
+          content-type="application/json"
+          last-response="{{related_#{value.model || value.collection}}}"
+        )
+    
+    //- Create the form.
     paper-material(elevation="1")
       h1 Create a new #{name}
+      
       form(is="iron-form")
         - each value, key in writable_attributes
+          //- If it's an assocation, we want to create 
+          //- a searchable select field to help the user
+          //- to find the right record.
+          //- If it's an enum, make another select field
+          //- where the options are the enum values.
+          //- Otherwise, just create an input.
           - if (value.model || value.collection)
-            paper-input(label="#{key}" name="#{key}" id="#{key}" list="#{key}-datalist" autocomplete)
-            datalist(id="#{key}-datalist")
-              option(value="test") rhgwr
-              option(value="cookies")
+            paper-select(
+              id="#{key}"
+              name="#{key}" 
+              label="Select #{key}"
+              value-field="id"
+              label-field="name"
+              multiple=!!value.collection
+              on-input-changed="_filter_options"
+              relation="related_#{value.model || value.collection}"
+            )
+          - else if (value.enum)
+            paper-select(
+              id="#{key}"
+              name="#{key}" 
+              label="Select #{key}"
+              options='[#{value.enum.map(value => `"${value}"`)}]'
+            )
           - else
             paper-input(label="#{key}" name="#{key}" type="#{value.type}" id="#{key}")
 
-        paper-button(raised on-click="_submit_new_#{name}") Create #{name}
+        paper-button(raised on-click="_submit_new") Create new #{name}
       
-  //- This is necessary because Jade doesn't
   script.
     Polymer({
       is: "#{name}-create",
@@ -39,7 +77,7 @@ dom-module(id="#{name}-create")
         keys: {
           type: String,
           readOnly: true,
-
+          
           //- Jade compiles this into an array like ["name", "age"]
           value: [!{Object.keys(writable_attributes).map(key => `"${key}"`)}]
         },
@@ -49,11 +87,57 @@ dom-module(id="#{name}-create")
           computed: "_xhr_headers(keys)"
         }
       },
-
-      _xhr_headers: function get_xhr_headers(stuff) {
+      
+      _filter_options: function _filter_options(event) {
+        //- Get the typed value.
+        var value = (event.detail.value || "").trim().toLowerCase()
+        
+        //- Get the related data.
+        var target_data = this.get(event.target.getAttribute("relation"))
+        
+        //- Check we have what we need.
+        if (!value || !target_data) {
+          event.target.options = []
+        }
+        else {
+          //- Show options that match what we typed.
+          event.target.options = this._optionated_results(target_data)
+            .filter(function options_filter(option) {
+              return option.name.toLowerCase().indexOf(value) >= 0
+            })
+        }
+      },
+      
+      _xhr_headers: function get_xhr_headers() {
         return window.app.get("headers")
       },
-
+      
+      /**
+       * Make the response from the server a valid 
+       * option for the paper-select options value.
+       * 
+       * @param  {Object} results from the server.
+       * @return {Array -> Object} Array of valid options for paper-select.
+       */
+      _optionated_results: function _optionated_results(results) {     
+        //- Loop over the data we got back from the server.
+        return results.data.map(function results_map(result) {
+          //- Find the first string type we can.
+          var target = Object.keys(result.attributes)
+            .filter(function attributes_filter(attribute) {
+              return typeof result.attributes[attribute] == "string"
+            })[0]
+          
+          //- Return an object for the options.
+          return {
+            id: result.id,
+            
+            //- Just select the first string we find.
+            name: result.attributes[target]
+          }
+        })
+      },
+      
       /**
        * Loop over the properties we have inputs for
        * and create the payload for Multicolour.
@@ -64,7 +148,7 @@ dom-module(id="#{name}-create")
        * 
        * @return {void}
        */
-      _submit_new_#{name}: function _submit_new_#{name}() {
+      _submit_new: function _submit_new() {
         //- Get the target.
         var target = this.$.req
         
@@ -79,4 +163,3 @@ dom-module(id="#{name}-create")
         target.generateRequest()
       }
     })
-    

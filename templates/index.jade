@@ -19,7 +19,7 @@ html(lang="en")
     
     //- Get our base stylesheet, prevent FOUC.
     link(rel="stylesheet" href="/css/base.css")
-    link(rel="mask-icon" href="/assets/website_icon.svg" color="red")
+    link(rel="mask-icon" href="/assets/website-icon.svg" color="#C43A8C")
     link(rel="icon" href="/assets/favicon.ico" type="image/x-icon")
     
     //- Import all of our elements.
@@ -33,7 +33,7 @@ html(lang="en")
             paper-icon-button#toggle(icon="menu" paper-drawer-toggle) Menu
 
           //- MENU.
-          paper-menu(attr-for-selected="data-route" selected="[[route]]")
+          paper-menu#main-menu(attr-for-selected="data-route" selected="[[route]]")
             a(data-route="home" href="/" is="pushstate-anchor")
               iron-icon(icon="home")
               span Home
