@@ -39,6 +39,8 @@ dom-module(id="#{name}-single")
     )
 
     section(class="#{name}-single")
+      a(is="pushstate-anchor" href$="/#{name}/[[rid]]/edit") Edit [[rid]]
+      
       paper-material(elevation="1")
         content
         each value, key in attributes

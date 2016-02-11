@@ -21,9 +21,9 @@
     window.app = document.querySelector("#app")
 
     // When the app is ready, add the stuff we need like XHR headers.
-    window.app.set("headers", Object.freeze({
+    window.app.set("headers", {
       accept: "application/vnd.api+json"
-    }))
+    })
 
     return window.app
   }

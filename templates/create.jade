@@ -14,11 +14,8 @@ dom-module(id="#{name}-create")
 
     //- Request for this particular resource.
     iron-ajax#req(
-      method="post"
-      url="#{api_root}/#{name}"
-      headers="{{xhr_headers}}"
       content-type="application/json"
-      last-response="{{new_#{name}}}"
+      on-response="created_callback"
     )
     
     //- For each writable key, check if it
@@ -38,14 +35,20 @@ dom-module(id="#{name}-create")
     paper-material(elevation="1")
       h1 Create a new #{name}
       
-      form(is="iron-form")
+      form#form(
+        is="iron-form"
+        action="#{api_root}/#{name}"
+        method="post"
+        headers="[[xhr_headers]]"
+        request="{{request_element}}"
+      )
         - each value, key in writable_attributes
           //- If it's an assocation, we want to create 
           //- a searchable select field to help the user
           //- to find the right record.
           //- If it's an enum, make another select field
           //- where the options are the enum values.
-          //- Otherwise, just create an input.
+          //- Otherwise, just create an input with a safe "type"
           - if (value.model || value.collection)
             paper-select(
               id="#{key}"
@@ -56,9 +59,17 @@ dom-module(id="#{name}-create")
               multiple=!!value.collection
               on-input-changed="_filter_options"
               relation="related_#{value.model || value.collection}"
+              required=!!value.required
             )
           - else if (value.enum)
-            paper-dropdown-menu(label="#{key}" id="#{key}" placeholder="Select #{key}" noink)
+            paper-dropdown-menu(
+              label="#{key}"
+              id="#{key}"
+              name="#{key}"
+              placeholder="Select #{key}"
+              noink
+              required=!!value.required
+            )
               paper-menu.dropdown-content
                 - each option_value, _ in value.enum
                   paper-item(value=option_value)= option_value
@@ -68,6 +79,9 @@ dom-module(id="#{name}-create")
               name="#{key}"
               label="#{key}"
               type="#{type_to_html_input_type(value.type)}"
+              required=!!value.required
+              min=value.minLength || value.min
+              max=value.maxLength || value.max
             )
 
         paper-button(raised on-click="_submit_new") Create new #{name}
@@ -88,6 +102,14 @@ dom-module(id="#{name}-create")
           type: Object,
           notify: true,
           computed: "_xhr_headers(keys)"
+        },
+        
+        request_element: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return this.$.req
+          }
         }
       },
       
@@ -97,6 +119,11 @@ dom-module(id="#{name}-create")
         
         //- Get the related data.
         var target_data = this.get(event.target.getAttribute("relation"))
+        
+        //- If no value found, show a list.
+        if (value === "") {
+          return event.target.options = this._optionated_results(target_data)
+        }
         
         //- Check we have what we need.
         if (!value || !target_data) {
@@ -113,6 +140,31 @@ dom-module(id="#{name}-create")
       
       _xhr_headers: function get_xhr_headers() {
         return window.app.get("headers")
+      },
+      
+      created_callback: function created_callback(event) {
+        //- Create an alert to show success.
+        var toast = document.createElement("paper-toast")
+        
+        //- When the request finishes,
+        // get whether it errored or 
+        // whether it was successful.
+        event.detail.completes
+          .then(function(data) {
+            //- Create a happy notification.
+            toast.text = "Success! Sending you to your new " + data.response.data.type + " now."
+            document.body.appendChild(toast)
+            toast.open()
+            
+            //- Go to the newly created resource.
+            document.querySelector("app-router").go("/#{name}/" + data.response.data.id, {replace: true})
+          }.bind(this))
+          .catch(function (error) {
+            //- Create a happy notification.
+            toast.text = "Something bad happened while trying to create your #{name}."
+            document.body.appendChild(toast)
+            toast.open()
+          }.bind(this))
       },
       
       /**
@@ -152,18 +204,11 @@ dom-module(id="#{name}-create")
        * @return {void}
        */
       _submit_new: function _submit_new() {
+        this.$.form.submit()
         //- Get the target.
-        var target = this.$.req
-        
-        //- Body is null by default, make it an object.
-        target.body = {}
-        
-        //- Get the keys from Multicolour.
-        this.get("keys").forEach(function(key) {
-          console.log(this.$[key])
-          target.body[key] = this.$[key].value
-        }.bind(this))
-        
-        target.generateRequest()
+        //- var target = this.$.req
+        //- 
+        //- //- Body is null by default, make it an object.
+        //- target.body = document.querySelector("form").serialize()
       }
     })

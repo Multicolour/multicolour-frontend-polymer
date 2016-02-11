@@ -2,20 +2,265 @@ link(rel="import" href="/bower_components/polymer/polymer.html")
 
 dom-module(id="#{name}-update")
   template
-    iron-ajax(
-      auto
-      id="#{name}-req"
-      url="#{api_root}/#{name}"
-      method="get"
-      handle-as="json"
-      last-response="{{response}}"
+    style.
+      :host {
+        display: block;
+        padding: 1em;
+      }
+      
+      paper-button {
+        margin-top: 1em;
+      }
+
+    //- Request for this particular resource.
+    iron-ajax#req(
+      content-type="application/json"
+      on-response="updated_callback"
     )
     
-    template(is="dom-repeat" items="response.items")
-      #{name + "-single"}(id="[[item.id]]")
+    iron-ajax(
+      auto="{{can_request_resource}}"
+      url="#{api_root}/#{name}/[[rid]]"
+      headers="{{xhr_headers}}"
+      content-type="application/json"
+      last-response="{{resource}}"
+    )
     
-    script.
-      Polymer({
-        is: "#{name}-update"
-      })
+    //- For each writable key, check if it
+    //- has any associations and create ajax
+    //- requests for each one.
+    - each value, key in writable_attributes
+      - if (value.model || value.collection)
+        iron-ajax(
+          auto="{{xhr_headers}}"
+          url="#{api_root}/#{value.model || value.collection}"
+          headers="{{xhr_headers}}"
+          content-type="application/json"
+          last-response="{{related_#{value.model || value.collection}}}"
+        )
+    
+    //- Create the form.
+    paper-material(elevation="1")
+      h1 Editing a #{name}
       
+      form#form(
+        is="iron-form"
+        action="#{api_root}/#{name}"
+        method="put"
+        headers="[[xhr_headers]]"
+        request="{{request_element}}"
+      )
+        - each value, key in writable_attributes
+          //- If it's an assocation, we want to create 
+          //- a searchable select field to help the user
+          //- to find the right record.
+          //- If it's an enum, make another select field
+          //- where the options are the enum values.
+          //- Otherwise, just create an input with a safe "type"
+          - if (value.model || value.collection)
+            paper-select(
+              name="#{key}" 
+              label="Select #{key}"
+              value-field="id"
+              label-field="name"
+              bind-value="{{#{key}}}"
+              multiple=!!value.collection
+              on-input-changed="_filter_options"
+              relation="related_#{value.model || value.collection}"
+              required=!!value.required
+            )
+          - else if (value.enum)
+            p #{name}: 
+              span {{_get_index_of_value('#{key}', [#{value.enum.map(val => `'${val}'`).join(', ')}])}}
+            paper-dropdown-menu(
+              label="#{key}"
+              name="#{key}"
+              value="{{#{key}::change}}"
+              placeholder="Select #{key}"
+              noink
+              required=!!value.required
+            )
+              paper-listbox.dropdown-content(
+                selected="{{_get_index_of_value('#{key}', [#{value.enum.map(val => `'${val}'`).join(', ')}])}}"
+              )
+                - each option_value, _ in value.enum
+                  paper-item(value=option_value)= option_value
+          - else
+            paper-input(
+              name="#{key}"
+              label="#{key}"
+              value="{{#{key}::change}}"
+              type="#{type_to_html_input_type(value.type)}"
+              required=!!value.required
+              min=value.min
+              minLength=value.minLength
+              max=value.max
+              maxLength=value.maxLength
+            )
+
+        paper-button(raised on-click="_submit_form") Save
+      
+  script.
+    Polymer({
+      is: "#{name}-update",
+      
+      properties: {
+        keys: {
+          type: String,
+          readOnly: true,
+          
+          //- Jade compiles this into an array like ["name", "age"]
+          value: [!{Object.keys(writable_attributes).map(key => `"${key}"`)}]
+        },
+        
+        resource: {
+          type: Object,
+          notify: true
+        },
+        
+        xhr_headers: {
+          type: Object,
+          notify: true,
+          computed: "_xhr_headers(keys)"
+        },
+        
+        can_request_resource: {
+          type: Boolean,
+          notify: true,
+          computed: "_can_request_resource(rid, xhr_headers)"
+        },
+        
+        request_element: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return this.$.req
+          }
+        }
+      },
+      
+      observers: [ "_set_properties(resource.*)" ],
+      
+      _set_properties: function _set_properties(changed) {
+        var values = changed.value
+        
+        //- Set the value on this thing.
+        Object.keys(values.data.attributes).forEach(function(key) {
+          this.set(key, values.data.attributes[key])
+        }.bind(this))
+      },
+      
+      _can_request_resource: function _can_request_resource(rid, xhr_headers) {
+        return !!rid && !!xhr_headers
+      },
+      
+      _get_index_of_value: function _get_index_of_value(value, values) {
+        console.log(values, value, values.indexOf(value));
+        return values.indexOf(value)
+      },
+      
+      _get_attribute: function _get_attribute(key) {
+        console.log("getting", key, this.get("resource"));
+        if (!this.get("resource") || !key) {
+          return ""
+        }
+        return this.get("resource").data.attributes[key.toString()]
+      },
+      
+      _filter_options: function _filter_options(event) {
+        //- Get the typed value.
+        var value = (event.detail.value || "").trim().toLowerCase()
+        
+        //- Get the related data.
+        var target_data = this.get(event.target.getAttribute("relation"))
+        
+        //- If no value found, show a list.
+        if (value === "") {
+          return event.target.options = this._optionated_results(target_data)
+        }
+        
+        //- Check we have what we need.
+        if (!value || !target_data) {
+          event.target.options = []
+        }
+        else {
+          //- Show options that match what we typed.
+          event.target.options = this._optionated_results(target_data)
+            .filter(function options_filter(option) {
+              return option.name.toLowerCase().indexOf(value) >= 0
+            })
+        }
+      },
+      
+      _xhr_headers: function get_xhr_headers() {
+        return window.app.get("headers")
+      },
+      
+      updated_callback: function updated_callback(event) {
+        //- Create an alert to show success.
+        var toast = document.createElement("paper-toast")
+        
+        //- When the request finishes,
+        // get whether it errored or 
+        // whether it was successful.
+        event.detail.completes
+          .then(function(data) {
+            //- Create a happy notification.
+            toast.text = "Saved!"
+            document.body.appendChild(toast)
+            toast.open()
+            
+            //- Go to the newly created resource.
+            //- document.querySelector("app-router").go("/#{name}/" + data.response.data.id, {replace: true})
+          }.bind(this))
+          .catch(function (error) {
+            //- Create a happy notification.
+            toast.text = "Something bad happened while trying to update your #{name}."
+            document.body.appendChild(toast)
+            toast.open()
+          }.bind(this))
+      },
+      
+      /**
+       * Make the response from the server a valid 
+       * option for the paper-select options value.
+       * 
+       * @param  {Object} results from the server.
+       * @return {Array -> Object} Array of valid options for paper-select.
+       */
+      _optionated_results: function _optionated_results(results) {
+        if (!results) {
+          return []
+        }
+        //- Loop over the data we got back from the server.
+        return results.data.map(function results_map(result) {
+          //- Find the first string type we can.
+          var target = Object.keys(result.attributes)
+            .filter(function attributes_filter(attribute) {
+              return typeof result.attributes[attribute] == "string"
+            })[0]
+          
+          //- Return an object for the options.
+          return {
+            id: result.id,
+            
+            //- Just select the first string we find.
+            name: result.attributes[target]
+          }
+        })
+      },
+      
+      /**
+       * Loop over the properties we have inputs for
+       * and create the payload for Multicolour.
+       * 
+       * Most of the time, you'll want to customise
+       * this and that negates the need for the keys
+       * property and this loop.
+       * 
+       * @return {void}
+       */
+      _submit_form: function _submit_form() {
+        this.$.form.submit()
+      }
+    })

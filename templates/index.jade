@@ -54,7 +54,7 @@ html(lang="en")
               p.app-description= config.frontend ? config.frontend.description : "REST API & Polymer app generator."
           
           //- ROUTER.
-          app-router
+          app-router(mode="pushstate")
             app-route(path="/" element="home-element")
             - each name in names
               app-route(path="/#{name}" element="#{name}-list")
