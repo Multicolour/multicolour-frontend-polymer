@@ -3,7 +3,7 @@
 // Get the file system
 const fs = require("fs-extra")
 const path = require("path")
-const colour = require("colors/safe")
+const colours = require("colors")
 
 // Where will the themes go?
 const install_to = path.resolve("../../content/frontend")
@@ -40,11 +40,11 @@ fs.stat(config.frontend.src, (err, stats) => {
     fs.copy(path.resolve("./templates"), config.frontend.src  + "ss", err => {
       if (err) {
         /* eslint-disable */
-        console.error(colour.blue(`
+        console.error(`
           Error installing default frontend source.
           Please copy "${path.resolve("./templates")}" to
           "${install_to}/src" manually
-        `))
+        `.red.bold)
         /* eslint-enable */
         process.exit(1)
       }
@@ -52,7 +52,9 @@ fs.stat(config.frontend.src, (err, stats) => {
 
     // Rewrite the config file.
     /* eslint-disable */
-    console.error(`
+    console.error(colour.yellow(`
+      ${"Could not write to your config file.".underline.bold}
+
       Please add:
 
       frontend: {
@@ -61,7 +63,7 @@ fs.stat(config.frontend.src, (err, stats) => {
       }
 
       to "${config_path}".
-    `)
+    `))
     /* eslint-enable */
   }
 })
