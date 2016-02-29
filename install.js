@@ -3,6 +3,7 @@
 // Get the file system
 const fs = require("fs-extra")
 const path = require("path")
+const colour = require("colors/safe")
 
 // Where will the themes go?
 const install_to = path.resolve("../../content/frontend")
@@ -31,21 +32,19 @@ else {
 fs.stat(config.frontend.src, (err, stats) => {
   if (stats) {
     /* eslint-disable */
-    console.log(`Not overwriting your theme: "${config.frontend.src}"`)
+    return console.log(colour.blue(`Not overwriting your theme: "${config.frontend.src}"`))
     /* eslint-enable */
-
-    process.exit(1)
   }
   else {
     // Copy the template files over.
     fs.copy(path.resolve("./templates"), config.frontend.src  + "ss", err => {
       if (err) {
         /* eslint-disable */
-        console.error(`
+        console.error(colour.blue(`
           Error installing default frontend source.
           Please copy "${path.resolve("./templates")}" to
           "${install_to}/src" manually
-        `)
+        `))
         /* eslint-enable */
         process.exit(1)
       }
