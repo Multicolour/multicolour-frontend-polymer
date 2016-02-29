@@ -18,6 +18,15 @@ if (!config.hasOwnProperty("frontend")) {
     build: `${install_to}/build`
   }
 }
+else {
+  if (!config.frontend.src) {
+    config.frontend.src = `${install_to}/src`
+  }
+
+  if (!config.frontend.build) {
+    config.frontend.build = `${install_to}/build`
+  }
+}
 
 fs.stat(config.frontend.src, (err, stats) => {
   if (stats) {
