@@ -3,7 +3,7 @@
 // Get the file system
 const fs = require("fs-extra")
 const path = require("path")
-const colours = require("colors")
+require("colors")
 
 // Where will the themes go?
 const install_to = path.resolve("../../content/frontend")
@@ -32,7 +32,7 @@ else {
 fs.stat(config.frontend.src, (err, stats) => {
   if (stats) {
     /* eslint-disable */
-    return console.log(colour.blue(`Not overwriting your theme: "${config.frontend.src}"`))
+    return console.log(`Not overwriting your theme: "${config.frontend.src}"`.blue)
     /* eslint-enable */
   }
   else {
@@ -52,7 +52,7 @@ fs.stat(config.frontend.src, (err, stats) => {
 
     // Rewrite the config file.
     /* eslint-disable */
-    console.error(colour.yellow(`
+    console.error(`
       ${"Could not write to your config file.".underline.bold}
 
       Please add:
@@ -63,7 +63,7 @@ fs.stat(config.frontend.src, (err, stats) => {
       }
 
       to "${config_path}".
-    `))
+    `.yellow)
     /* eslint-enable */
   }
 })
