@@ -39,10 +39,9 @@ class Multicolour_Frontend_Polymer {
     multicolour.reply("frontend", this)
 
     // Listen for when the host is ready.
-    multicolour.on("server_starting", server => {
+    multicolour.on("server_starting", () => {
       // Get the host
-      const host = server.request("host")
-      this.targets = host.get("database").get("models")
+      this.targets = multicolour.get("database").get("models")
 
       // If we requested to generate but there where
       // no models set (because the server wasn't ready)
