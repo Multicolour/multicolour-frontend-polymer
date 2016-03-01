@@ -41,11 +41,12 @@ fs.stat(config.frontend.src, (err, stats) => {
       if (err) {
         /* eslint-disable */
         console.error(`
-          Error installing default frontend source.
-          Please copy "${path.resolve("./templates")}" to
-          "${install_to}/src" manually
+          ${"Error installing default frontend source.".underline.bold}
+
+          Please copy "${path.resolve("./templates")}" to "${install_to}/src" manually.
         `.red.bold)
         /* eslint-enable */
+
         process.exit(1)
       }
     })
