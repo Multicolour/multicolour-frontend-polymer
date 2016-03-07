@@ -9,6 +9,9 @@ class Multicolour_Frontend_Polymer {
     this.config = null
     this.host = null
     this.has_requested_generation = false
+
+    this._last_compile = false
+    this._fs_throttle = 100
   }
 
   register(multicolour) {
@@ -85,6 +88,11 @@ class Multicolour_Frontend_Polymer {
   }
 
   generate() {
+    // Throttle the compilation.
+    if (this._last_compile && this._last_compile + this._fs_throttle > Date.now()) {
+      return
+    }
+
     // Get the tools.
     const Async = require("async")
     const Utils = require("./lib/utils")
@@ -147,6 +155,9 @@ class Multicolour_Frontend_Polymer {
           }
           else {
             console.log("Compiled %s files listed in frontend.json", directives.length)
+
+            // Last compile time for throttling.
+            this._last_compile = Date.now()
           }
           /* eslint-enable */
         })
