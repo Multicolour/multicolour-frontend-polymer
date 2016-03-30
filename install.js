@@ -37,7 +37,7 @@ fs.stat(config.frontend.src, (err, stats) => {
   }
   else {
     // Copy the template files over.
-    fs.copy(path.resolve("./templates"), config.frontend.src  + "ss", err => {
+    fs.copy(path.resolve("./templates"), config.frontend.src, err => {
       if (err) {
         /* eslint-disable */
         console.error(`
@@ -46,8 +46,6 @@ fs.stat(config.frontend.src, (err, stats) => {
           Please copy "${path.resolve("./templates")}" to "${install_to}/src" manually.
         `.red.bold)
         /* eslint-enable */
-
-        process.exit(1)
       }
     })
 
