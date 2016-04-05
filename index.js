@@ -56,6 +56,18 @@ class Multicolour_Frontend_Polymer {
   }
 
   /**
+   * Custom data is passed to each view during
+   * compilation. It is passed to the view with
+   * the key `meta` and can be anything.
+   * @param {Any} data to pass to the view for compilation.
+   * @return {Multicolour_Frontend_Polymer} Object for chaining.
+   */
+  add_custom_data(data) {
+    this._custom_data = data
+    return this
+  }
+
+  /**
    * Watch files in the build directory for changes
    * and regenerate if/when anything changes and live
    * reload any open browsers with livereload enabled.
@@ -143,6 +155,7 @@ class Multicolour_Frontend_Polymer {
             models,
             models_obj,
             config: config_as_json,
+            meta: this._custom_data,
             package: require("../../package.json"),
             type_to_html_input_type: Utils.type_to_html_input_type,
             api_root: config_as_json.frontend && config_as_json.frontend.api_root ||
