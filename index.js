@@ -99,7 +99,7 @@ class Multicolour_Frontend_Polymer {
     return this
   }
 
-  generate() {
+  generate(done) {
     // Throttle the compilation.
     if (this._last_compile && this._last_compile + this._fs_throttle > Date.now()) {
       return
@@ -184,12 +184,12 @@ class Multicolour_Frontend_Polymer {
         next => next(null, models.map(model => new Model_Generator(model, this))),
 
         // Generate the templates.
-        (generators, next) => generators.forEach(generator => Async.parallel([
+        (generators, complete) => generators.forEach(generator => Async.parallel([
           next => generator.list(next),
           next => generator.single(next),
           next => generator.create(next),
           next => generator.update(next)
-        ], next)),
+        ], complete)),
 
         // Generate the app template.
         (_, next) => {
@@ -208,8 +208,13 @@ class Multicolour_Frontend_Polymer {
         console.log("---")
         console.log("Took: %sms", Date.now() - start)
         /* eslint-enable*/
+
+        // Fire any callback.
+        done && done(err)
       }
     )
+
+    return this
   }
 }
 
