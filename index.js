@@ -29,14 +29,11 @@ class Multicolour_Frontend_Polymer {
 
     // Get the config and default if no specific config was found.
     const config = this.config.get("frontend")
-    if (!config) {
-      this.src = path.join(this.config.get("content"), "frontend", "src")
-      this.build = path.join(this.config.get("content"), "frontend", "build")
-    }
-    else {
-      this.src = config.theme_src_dir || path.join(this.config.get("content"), "frontend", "src")
-      this.build = config.theme_src_dir || path.join(this.config.get("content"), "frontend", "build")
-    }
+
+    this.src = path.join(this.config.get("content"), "frontend", "src")
+    this.build = path.join(this.config.get("content"), "frontend", "build")
+
+    Object.assign(this, config)
 
     // Register the frontend.
     multicolour.reply("frontend", this)
