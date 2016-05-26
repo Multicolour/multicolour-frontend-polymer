@@ -39,7 +39,7 @@ class Multicolour_Frontend_Polymer {
     multicolour.reply("frontend", this)
 
     // Listen for when the host is ready.
-    multicolour.on("server_starting", () => {
+    multicolour.on("database_started", () => {
       // Get the host
       this.targets = multicolour.get("database").get("models")
 
@@ -99,7 +99,13 @@ class Multicolour_Frontend_Polymer {
   generate(done) {
     // Throttle the compilation.
     if (this._last_compile && this._last_compile + this._fs_throttle > Date.now()) {
-      return
+      return this
+    }
+
+    // Wait until we have models to generate with.
+    if (!this.targets) {
+      this.has_requested_generation = true
+      return this
     }
 
     // Get the tools.
@@ -107,12 +113,6 @@ class Multicolour_Frontend_Polymer {
     const Utils = require("./lib/utils")
     const start = Date.now()
     const config_as_json = Utils.map_to_object(this.config)
-
-    // Wait until we have models to generate with.
-    if (!this.targets) {
-      this.has_requested_generation = true
-      return this
-    }
 
     // Get the valid models for generation.
     const models = Object.keys(this.targets)
