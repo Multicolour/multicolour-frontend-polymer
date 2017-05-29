@@ -1,5 +1,7 @@
 # multicolour-polymer
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Multicolour/multicolour-frontend-polymer.svg)](https://greenkeeper.io/)
+
 Polymer front end generator for Multicolour applications. Your CRUD operations
 are generated for you.
 
